@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>IELTS Mastery OS v5.0</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="top">
+  <h1>🎓 IELTS Mastery OS <span class="muted">v5.0 PWA</span></h1>
+  <div class="row">
+    <span id="xpBadge" class="muted">XP 0</span>
+    <button id="themeBtn" type="button" aria-label="テーマ切替">🌗</button>
+    <button id="vibeBtn" type="button" aria-label="バイブ切替">📳</button>
+    <button id="sfxBtn" type="button" aria-label="効果音切替">🔊</button>
+  </div>
+</header>
+<main>
+  <!-- TODAY -->
+  <section class="tab" id="tab-today">
+    <div class="card" id="sanctuaryCard"><canvas class="chart" id="sanctCanvas" width="640" height="190"></canvas><div id="sanctSvg" style="display:none"></div><p class="muted" id="sanctLabel"></p></div>
+    <div class="card hero"><h2 id="heroGreet">🎓 IELTS Mastery OS</h2>
+      <p class="muted" id="heroText">今日のセッションを始めましょう。</p>
+      <div class="row"><button class="primary big" id="heroBtn" type="button">🎤 40分セッションを開始</button></div>
+      <label><input type="checkbox" id="travelToggle"> 🚃 今日は移動日（声が出せない）</label>
+      <div class="steps" id="stepsBar" aria-label="今日の4ステップ進捗"><span data-step="warmup">1 Warm-up</span><span data-step="speak">2 Speak</span><span data-step="grammar">3 Grammar/SRS</span><span data-step="log">4 Log</span></div>
+    </div>
+    <div class="card"><h2>📬 Museコーチ</h2>
+      <div class="row"><button class="primary" id="coachSendBtn" type="button">📤 今日のDaily Packetを自動生成してMuseへ送信</button><button id="coachPullBtn" type="button">📥 返信を取得</button></div>
+      <div id="coachInbox"><p class="muted">返信はまだありません</p></div>
+    </div>
+    <div class="card"><h2>📅 Today — 40分セッション</h2>
+      <p class="muted" id="missionBox">ミッション読込中…</p>
+      <div class="row"><button class="primary" id="startSessionBtn" type="button">▶ 40分セッション開始</button>
+      <button id="silent3Btn" type="button">🤫 移動日3分サイレント</button></div>
+      <p id="sessionStatus" class="muted"></p>
+      <p>Band-Ladder: <strong id="ladderBox">Stage 1（5.5→6.0）</strong> ／ Cycle: <span id="cycleBox">○○○○</span></p>
+      <div class="heat" id="weekHeat" aria-label="週間ヒートマップ"></div>
+    </div>
+    <div class="card"><h2>☁️ クラウド＆Muse</h2>
+      <p class="muted" id="syncStatus">未設定（HubでGAS URL/Tokenを設定）</p>
+      <div class="row"><button id="todaySyncBtn" type="button">🔄 状態同期</button>
+      <button id="todayOutboxBtn" type="button">📥 Muse 返信を取得</button></div>
+      <p class="muted" id="outboxStatus"></p>
+    </div>
+    <div class="card"><h2>🎧 ポケット・シャドーイング</h2>
+      <label>教材 <select id="shadowSource"></select></label>
+      <div class="row"><button class="primary" id="shadowPlay" type="button">▶ 再生</button><button id="shadowPrev" type="button">⏮ 前の文</button><button id="shadowNext" type="button">⏭ 次の文</button><button id="shadowPause" type="button">⏸ 一時停止</button></div>
+      <label>速度 <input type="range" id="shadowRate" min="0.8" max="1.25" step="0.05" value="1"></label>
+      <label>リピート <input type="number" id="shadowRepeat" min="1" max="5" value="1"></label>
+      <p class="muted" id="shadowNow"></p>
+      <h3>🌧 集中アンビエント音</h3>
+      <div class="row"><button id="ambRain" type="button">🌧 雨音</button><button id="ambNoise" type="button">📚 ホワイトノイズ</button><button id="ambOff" type="button">⏹ 停止</button></div>
+      <label>音量 <input type="range" id="ambVol" min="0" max="1" step="0.05" value="0.3"></label>
+    </div>
+  </section>
+
+  <!-- SPEAK -->
+  <section class="tab" id="tab-speak">
+    <div class="card"><h2>🎤 スピーキング・タイマー</h2>
+      <label>パート <select id="partSel"><option value="1">Part 1（35/45秒アラート）</option><option value="2">Part 2（1分準備＋2分）</option><option value="3">Part 3</option></select></label>
+      <p id="qText" class="flash">パック同期後に問題が出ます</p>
+      <div class="row"><button id="riderJumpBtn" type="button">🏍 Riderで初動トレーニング</button><button id="nextQBtn" type="button">🎲 次の問題</button><button class="primary" id="recBtn" type="button">⏺ 録音開始</button><button id="stopBtn" type="button">⏹ 停止</button></div>
+      <p>経過: <strong id="timerBox">0.0s</strong> ／ 初動遅延: <strong id="latencyBox">—</strong></p>
+      <canvas class="chart" id="silenceCanvas" width="640" height="90"></canvas>
+      <p class="muted">沈黙ヒートマップ（赤=沈黙区間・タップで2秒前から再生）</p>
+      <audio id="recAudio" controls style="width:100%"></audio>
+      <p class="muted">録音は一時Blobのみ。保存・送信しません。</p>
+      <label>Part 2 4マス即席メモ <textarea id="memo4" placeholder="結論 / 理由1 / 理由2 / 例"></textarea></label>
+    </div>
+    <div class="card"><h2>✍️ 英文Linter＆即リトライ</h2>
+      <label>トランスクリプト <textarea id="transcript" placeholder="音声認識結果または手入力"></textarea></label>
+      <div class="row"><button class="primary" id="lintBtn" type="button">🔍 チェック</button><button id="retryBtn" type="button">🔁 Immediate Retry</button><button id="gboardBtn" type="button">⌨️ Gboard音声入力ライブモード</button></div>
+      <div id="gboardBox" class="muted"></div><div id="gboardPreview"></div>
+      <div id="lintOut"></div>
+      <p id="speakScore" class="disclaimer"></p>
+    </div>
+    <div class="card"><h2>👄 発音道場</h2>
+      <div id="mouthBox"></div>
+      <label>ミニマルペア <select id="pairSel"></select></label>
+      <div class="row"><button id="pairSpeak" type="button">🔊 聞く</button><button id="benchBtn" type="button">⏱ Benchmark 30s</button></div>
+      <p class="muted" id="benchText"></p>
+      <p class="muted">※ 発音の指摘はすべて「疑われる発音ターゲット（ローカル音声推定の目安）」です。認識結果だけで断定はしません。</p>
+      <p class="muted" id="mouthNote"></p>
+      <canvas class="chart" id="pitchCanvas" width="640" height="140"></canvas>
+      <p class="disclaimer">ピッチ・スコアはローカル簡易推定でありIELTS公式スコアではない</p>
+      <canvas class="chart" id="specCanvas" width="640" height="100"></canvas>
+    </div>
+  </section>
+
+  <!-- SILENT -->
+  <section class="tab" id="tab-silent">
+    <div class="card"><h2>🃏 SRS（SM-2）</h2>
+      <p class="muted" id="silentTimerBox"></p><div class="row"><button id="silent3StopBtn" type="button">⏹ サイレント停止</button></div>
+      <div class="row"><button id="srsDueBtn" type="button">期限のみ</button><button id="srsAllBtn" type="button">全件</button><button id="srsExportBtn" type="button">Anki TSV出力</button></div>
+      <div class="flash" id="srsCard">パック同期後にカードが出ます</div>
+      <div class="row"><button data-grade="1" class="gradeBtn" type="button">もう一度</button><button data-grade="3" class="gradeBtn" type="button">普通</button><button data-grade="5" class="gradeBtn" type="button">簡単</button><button id="srsSpeakBtn" type="button">🔊 声採点（認識）</button><button id="srsRepairBtn" type="button">⚡ 3秒リペア</button></div>
+      <p class="muted" id="srsMeta"></p>
+    </div>
+    <div class="card"><h2>🧪 Band Alchemist</h2>
+      <div class="row"><button id="alcT2Btn" type="button">Task 2（120問）</button><button id="alcT1Btn" type="button">Task 1（50問）</button><button id="alcNextBtn" type="button">次の問題</button></div>
+      <div id="alcBox"></div>
+    </div>
+    <div class="card"><h2>🔬 Reading Paraphrase X-Ray</h2>
+      <label>パッセージ <select id="readSel"></select></label>
+      <div id="readBox"></div>
+      <svg class="chart" id="xraySvg" viewBox="0 0 640 90" aria-label="証拠矢印"></svg>
+      <div id="readQBox"></div>
+    </div>
+    <div class="card"><h2>📊 Writing PEEL＆Task 1チャートラボ</h2>
+      <label>チャート <select id="chartSel"></select></label>
+      <div id="chartBox"></div>
+      <label>あなたの要約（PEEL: Point/Evidence/Explain/Link） <textarea id="peelText" placeholder="1分要約を書いてください"></textarea></label>
+      <div class="row"><button id="peelBtn" type="button">🩻 PEEL X線チェック</button></div>
+      <div id="peelOut"></div>
+    </div>
+  </section>
+
+  <!-- ARENA -->
+  <section class="tab" id="tab-arena">
+    <div class="card"><h2>⚔️ GRAMMAR BESTIARY: SHADOW OF BAND 7</h2>
+      <p class="muted">5ステージのローグライト：通常戦→エリート→回復の泉→中ボス→弱点ボス。討伐でレリック獲得（最大3つ装備）。ゲームの数値はIELTSスコアではありません。</p>
+      <label>弱点ボス <select id="bstBossSel"></select></label>
+      <div class="row"><button class="primary" id="bstStartBtn" type="button">⚔️ ラン開始</button><button id="bstPauseBtn" type="button">⏸ ポーズ</button></div>
+      <label><input type="checkbox" id="bstModeChk"> 🐢 じっくりターン制モード（敵は自動で攻撃してこない）</label>
+      <p id="bstStageLabel" class="muted">ボスを選んでラン開始</p>
+      <canvas class="chart" id="bstCanvas" width="640" height="300"></canvas>
+      <div class="row"><span style="flex:1">敵HP <span class="barwrap"><span id="bstBossHp" class="barfill"></span></span></span></div>
+      <div class="row"><span style="flex:1">自分HP <span class="barwrap"><span id="bstPlayerHp" class="barfill"></span></span></span></div>
+      <div class="row"><span style="flex:1">敵ATB <span class="barwrap"><span id="bstAtb" class="barfill"></span></span></span></div>
+      <p class="muted" id="bstCombo"></p>
+      <p id="bstPrompt" class="flash" style="font-size:16px;text-align:left"></p>
+      <div id="bstChoices" class="row"></div>
+      <p class="muted" id="bstLog"></p>
+      <h3>🗝 レリック（最大3つ装備）</h3>
+      <div id="bstRelics"></div>
+    </div>
+    <div class="card"><h2>🚪 Barge-in Dojo＆追撃・Mock</h2>
+      <div class="row"><button id="bargeBtn" type="button">シナリオ開始</button><button id="bargeHitBtn" type="button">✋ 割り込む（Space可）</button><button id="mockBtn" type="button">📝 Mock Exam 12分/6分</button></div>
+      <div id="bargeBox"></div>
+    </div>
+    <div class="card"><h2>🏍 NEON FLUENCY RIDER</h2>
+      <p class="muted">KLの夜景を疾走する音ゲー＆ボイスランナー。ゲームの数値はIELTSスコアではありません。</p>
+      <label>Voiceモードのお題 <select id="riderPromptSel"><option value="bench">Benchmark文章（40本）</option><option value="qbank">Part 1 のお題</option></select></label>
+      <div class="row"><button class="primary" id="riderVoiceBtn" type="button">🎤 Voice Fluency Runner</button><button id="riderRhythmBtn" type="button">🤫 Silent Rhythm（移動中）</button><button id="riderStopBtn" type="button">⏹ 停止</button></div>
+      <p class="muted" id="riderText">モードを選んでください</p>
+      <canvas class="chart" id="riderCanvas" width="640" height="360"></canvas>
+      <p class="muted" id="riderHud"></p>
+      <div class="row"><button class="laneBtn" id="riderLane0" type="button" style="display:none;flex:1">◀ A / 強勢1</button><button class="laneBtn" id="riderLane1" type="button" style="display:none;flex:1">B / 強勢2</button><button class="laneBtn" id="riderLane2" type="button" style="display:none;flex:1">強勢3 ▶</button></div>
+      <p class="muted" id="riderLog"></p>
+    </div>
+    <div class="card"><h2>💬 MONASH SEMINAR TACTICS</h2>
+      <p class="muted">セミナー室の戦術会話バトル。相手の発話バーの金色ゾーンで割り込むとカットイン発動、その後の「譲歩＋主張」で説得力を押し切ろう。</p>
+      <div class="row"><label>シナリオ <select id="semFilterSel"><option value="all">全て</option><option value="ACW3120">ACW3120（会計）</option><option value="FIT3155">FIT3155（CS）</option><option value="general">一般</option></select></label><button class="primary" id="semStartBtn" type="button">💬 セミナー対戦開始</button></div>
+      <div class="row"><label>Debateトピック <select id="semTopicSel"></select></label><label>立場 <select id="semSideSel"><option value="for">賛成</option><option value="against">反対</option></select></label><button id="semDebateBtn" type="button">😈 Debate対戦開始</button></div>
+      <div class="semstage"><canvas class="chart" id="semCanvas" width="640" height="300"></canvas><div id="semCutin"></div></div>
+      <p id="semBubble" class="flash" style="font-size:15px;text-align:left"></p>
+      <div class="barwrap" style="width:100%"><span id="semBar" class="barfill sembar"></span></div>
+      <div class="row"><button class="primary big" id="semHitBtn" type="button">✋ 割り込む（Space）</button></div>
+      <div id="semChoices" class="row"></div>
+      <p class="muted" id="semLog"></p>
+    </div>
+    <div class="card"><h2>😈 Devil's Advocate Arena</h2>
+      <label>トピック <select id="debSel"></select></label>
+      <div id="debBox"></div>
+      <div class="row"><button id="debForBtn" type="button">賛成側で対戦</button><button id="debAgainstBtn" type="button">反対側で対戦</button><button id="debConcedeBtn" type="button">🃏 譲歩カード</button></div>
+      <p class="muted" id="debLog"></p>
+    </div>
+    <div class="card"><h2>🎡 Accent Roulette</h2>
+      <div class="row"><button id="accentBtn" type="button">🎲 アクセント抽選</button></div>
+      <p id="accentBox" class="muted"></p>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="tab" id="tab-hub">
+    <div class="card"><h2>📈 成長グラフ</h2>
+      <svg class="chart" id="growthSvg" viewBox="0 0 640 220"></svg>
+      <svg class="chart" id="radarSvg" viewBox="0 0 300 220"></svg>
+      <p class="disclaimer">全スコアはローカル簡易推定でありIELTS公式スコアではない</p>
+      <p id="achieveBox" class="muted"></p>
+    </div>
+    <div class="card"><h2>☁️ クラウド同期設定</h2>
+      <label>GAS WebアプリURL <input id="gasUrl" type="url" placeholder="https://script.google.com/..."></label>
+      <label>トークン <input id="gasToken" type="password" autocomplete="off"></label>
+      <p class="muted">トークンは端末の localStorage（imos.gas）のみに保存。コードにハードコードしません。</p>
+      <div class="row"><button class="primary" id="gasSaveBtn" type="button">保存</button><button id="packSyncBtn" type="button">☁️ Driveから最新パック一括同期</button></div>
+      <label><input type="checkbox" id="packForce"> 強制全同期（チェックなしは更新分だけ差分同期）</label>
+      <progress id="packProg" value="0" max="13"></progress><p class="muted" id="packProgText"></p>
+      <label>手動パック取込（D&amp;D可） <input id="packFile" type="file" accept=".json" multiple></label>
+      <div class="row"><button id="qrBtn" type="button">📱 Androidへ転送QRを表示</button></div>
+      <div id="qrBox"></div>
+      <p class="muted">QRにはGAS URLとトークンが含まれますが、URLフラグメント（#以降）として渡すためサーバーへは送信されません。周囲に人がいる場所では表示に注意してください。</p>
+      <label><input type="checkbox" id="animToggle"> 🎞 軽量アニメーションOFF（バッテリー節約）</label>
+      <div class="row"><button id="stateSyncBtn" type="button">PC⇄Android 状態同期</button><button id="enqueueBtn" type="button">📤 Daily Packetを Muse へ</button><button id="outboxBtn" type="button">📥 Muse Outbox取得</button></div>
+      <p class="muted" id="hubSyncStatus"></p>
+    </div>
+    <div class="card"><h2>💾 バックアップ＆診断</h2>
+      <div class="row"><button id="exportBtn" type="button">JSON完全バックアップ</button><label class="btn">取込 <input id="importFile" type="file" accept=".json" hidden></label><button id="selfTestBtn" type="button">🧪 セルフテスト</button></div>
+      <div id="selfTestOut"></div>
+      <p class="muted" id="updateBox"></p>
+    </div>
+  </section>
+</main>
+<nav class="bottomnav" aria-label="メインナビゲーション">
+  <button data-tab="today" type="button" aria-selected="true">🏠<span>Today</span></button>
+  <button data-tab="speak" type="button" aria-selected="false">🎤<span>Speak</span></button>
+  <button data-tab="silent" type="button" aria-selected="false">🤫<span>Silent</span></button>
+  <button data-tab="arena" type="button" aria-selected="false">⚔️<span>Arena</span></button>
+  <button data-tab="hub" type="button" aria-selected="false">📊<span>Hub</span></button>
+</nav>
+<script src="js/core.js"></script>
+<script src="js/qr.js"></script>
+<script src="js/audio-dsp.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/vfx-engine.js"></script>
+<script src="js/game-bestiary.js"></script>
+<script src="js/game-rider.js"></script>
+<script src="js/game-seminar.js"></script>
+<script src="js/sanctuary.js"></script>
+<script src="js/pack-adapters.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
