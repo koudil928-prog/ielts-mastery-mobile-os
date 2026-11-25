@@ -1,0 +1,24 @@
+{
+"background_color": "#0b1220",
+"description": "IELTS Mastery Mobile OS v5.0 — Android完全対応PWA学習スイート",
+"display": "standalone",
+"icons": [
+{"purpose": "any", "sizes": "any", "src": "icons/icon.svg", "type": "image/svg+xml"},
+{"purpose": "any", "sizes": "192x192", "src": "icons/icon-192.png", "type": "image/png"},
+{"purpose": "any", "sizes": "512x512", "src": "icons/icon-512.png", "type": "image/png"},
+{"purpose": "maskable", "sizes": "512x512", "src": "icons/icon-512.png", "type": "image/png"}
+],
+"lang": "ja",
+"name": "IELTS Mastery OS",
+"orientation": "portrait",
+"scope": "./",
+"short_name": "IELTS OS",
+"shortcuts": [
+{"icons": [{"sizes": "192x192", "src": "icons/icon-192.png"}], "name": "今すぐ35秒スピーキング", "short_name": "35秒スピーク", "url": "./index.html?tab=speak&quick=35s"},
+{"icons": [{"sizes": "192x192", "src": "icons/icon-192.png"}], "name": "移動日3分サイレント", "short_name": "3分サイレント", "url": "./index.html?tab=silent&quick=3min"},
+{"icons": [{"sizes": "192x192", "src": "icons/icon-192.png"}], "name": "モンスター討伐", "short_name": "討伐", "url": "./index.html?tab=arena&quick=monster"},
+{"icons": [{"sizes": "192x192", "src": "icons/icon-192.png"}], "name": "期限SRS", "short_name": "期限SRS", "url": "./index.html?tab=silent&quick=srs"}
+],
+"start_url": "./index.html",
+"theme_color": "#0b1220"
+}
